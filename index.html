@@ -2,553 +2,363 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Live Room Detector (iPhone)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Live Detector (iPhone-friendly)</title>
   <style>
-    :root{
-      --bg0:#070612;
-      --bg1:#0b0a1d;
-      --card: rgba(255,255,255,.06);
-      --stroke: rgba(255,255,255,.12);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.65);
-      --accent:#7c4dff;
-      --accent2:#00e5ff;
-      --good:#2dff9a;
-      --warn:#ffd166;
-      --bad:#ff4d6d;
-      --r:18px;
-      --shadow: 0 18px 70px rgba(0,0,0,.55);
-    }
+    :root{--bg:#070612;--card:rgba(255,255,255,.06);--stroke:rgba(255,255,255,.12);--text:rgba(255,255,255,.92);--muted:rgba(255,255,255,.65);--good:#2dff9a;--warn:#ffd166;}
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color:var(--text);
-      background: radial-gradient(1200px 800px at 20% 10%, rgba(124,77,255,.25), transparent 60%),
-                  radial-gradient(900px 700px at 90% 20%, rgba(0,229,255,.18), transparent 55%),
-                  linear-gradient(180deg, var(--bg0), var(--bg1));
-      min-height:100vh;
-      display:flex;
-      justify-content:center;
-      padding: env(safe-area-inset-top) 14px env(safe-area-inset-bottom);
-    }
-    .app{
-      width:min(980px, 100%);
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px 14px;
-      border:1px solid var(--stroke);
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-    }
-    .title{
-      display:flex; gap:10px; align-items:center;
-      font-weight:800; letter-spacing:.3px;
-    }
-    .dot{
-      width:12px;height:12px;border-radius:999px;
-      background: radial-gradient(circle at 30% 30%, var(--good), rgba(45,255,154,.2));
-      box-shadow: 0 0 18px rgba(45,255,154,.55);
-    }
-    .sub{
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .stage{
-      position:relative;
-      width:100%;
-      aspect-ratio: 16 / 9; /* updated after video metadata loads */
-      border-radius: calc(var(--r) + 6px);
-      overflow:hidden;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.35);
-      box-shadow: var(--shadow);
-    }
-    video, canvas{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-    }
-    video{
-      object-fit: fill; /* stage keeps correct aspect ratio */
-      background: rgba(0,0,0,.2);
-    }
-    canvas{
-      pointer-events:none;
-    }
-    .hud{
-      position:absolute; left:10px; top:10px;
-      display:flex; gap:8px; flex-wrap:wrap;
-      z-index:5;
-    }
-    .pill{
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.35);
-      backdrop-filter: blur(8px);
-      padding:6px 10px;
-      border-radius: 999px;
-      font-size:12px;
-      color: var(--text);
-    }
-
-    .panel{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      padding:12px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.05);
-      border-radius: var(--r);
-    }
-    button, select, input[type="range"]{
-      border-radius: 12px;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.25);
-      color: var(--text);
-      padding:10px 12px;
-      font-size:14px;
-      outline:none;
-    }
-    button{
-      cursor:pointer;
-      background: linear-gradient(180deg, rgba(124,77,255,.45), rgba(124,77,255,.15));
-      border-color: rgba(124,77,255,.35);
-    }
-    button.secondary{
-      background: rgba(0,0,0,.25);
-      border-color: var(--stroke);
-    }
-    button:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-    }
-    .field{
-      display:flex; gap:8px; align-items:center;
-      padding:8px 10px;
-      border:1px solid var(--stroke);
-      border-radius: 12px;
-      background: rgba(0,0,0,.18);
-    }
-    .field label{
-      font-size:12px; color: var(--muted);
-      margin-right:2px;
-      white-space:nowrap;
-    }
-    .field .val{
-      font-variant-numeric: tabular-nums;
-      font-size:12px; color: var(--text);
-      min-width:46px;
-      text-align:right;
-    }
-    details{
-      border:1px solid var(--stroke);
-      border-radius: var(--r);
-      background: rgba(255,255,255,.04);
-      overflow:hidden;
-    }
-    summary{
-      padding:10px 12px;
-      cursor:pointer;
-      color: var(--muted);
-      user-select:none;
-    }
-    pre{
-      margin:0;
-      padding:10px 12px;
-      color: rgba(255,255,255,.75);
-      font-size:12px;
-      overflow:auto;
-      max-height: 220px;
-      background: rgba(0,0,0,.25);
-      border-top:1px solid var(--stroke);
-    }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#070612,#0b0a1d);color:var(--text);padding:12px}
+    .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+    .bar{border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border-radius:16px;padding:12px}
+    .title{font-weight:800}
+    .sub{color:var(--muted);font-size:12px;margin-top:4px}
+    .stage{position:relative;border:1px solid var(--stroke);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.35)}
+    video,canvas{position:absolute;inset:0;width:100%;height:100%}
+    video{object-fit:cover}
+    .hud{position:absolute;left:10px;top:10px;display:flex;gap:8px;flex-wrap:wrap;z-index:5}
+    .pill{border:1px solid var(--stroke);background:rgba(0,0,0,.35);backdrop-filter:blur(8px);padding:6px 10px;border-radius:999px;font-size:12px}
+    .panel{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border:1px solid var(--stroke);background:rgba(255,255,255,.05);border-radius:16px;padding:10px}
+    button,select{border-radius:12px;border:1px solid var(--stroke);background:rgba(0,0,0,.25);color:var(--text);padding:10px 12px;font-size:14px}
+    button{background:linear-gradient(180deg,rgba(45,255,154,.25),rgba(45,255,154,.10));border-color:rgba(45,255,154,.35);cursor:pointer}
+    button.secondary{background:rgba(0,0,0,.25);border-color:var(--stroke)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .field{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--stroke);border-radius:12px;background:rgba(0,0,0,.18)}
+    .field label{font-size:12px;color:var(--muted);white-space:nowrap}
+    input[type="range"]{width:190px}
+    pre{margin:0;white-space:pre-wrap;color:rgba(255,255,255,.75);font-size:12px;max-height:180px;overflow:auto}
   </style>
 </head>
-
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div>
-        <div class="title">
-          <div class="dot"></div>
-          <div>Live Room Detector</div>
-        </div>
-        <div class="sub">Objects (includes “person”) + Faces • runs on-device in your browser</div>
-      </div>
-      <div class="sub" id="hint">Tip: host on HTTPS (GitHub Pages/Netlify) to use iPhone camera.</div>
-    </div>
-
-    <div class="stage" id="stage">
-      <video id="video" playsinline muted autoplay></video>
-      <canvas id="overlay"></canvas>
-      <div class="hud">
-        <div class="pill" id="status">Status: idle</div>
-        <div class="pill" id="fps">FPS: --</div>
-        <div class="pill" id="modePill">Mode: both</div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <button id="startBtn">Start Camera</button>
-      <button id="stopBtn" class="secondary" disabled>Stop</button>
-
-      <div class="field">
-        <label for="modeSel">Mode</label>
-        <select id="modeSel">
-          <option value="objects">Objects (includes person)</option>
-          <option value="faces">Faces</option>
-          <option value="both" selected>Objects + Faces</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="camSel">Camera</label>
-        <select id="camSel">
-          <option value="environment" selected>Back</option>
-          <option value="user">Front</option>
-        </select>
-      </div>
-
-      <div class="field" style="flex:1; min-width: 240px;">
-        <label for="thr">Min score</label>
-        <input id="thr" type="range" min="0.10" max="0.90" step="0.05" value="0.50" style="width: 100%;">
-        <div class="val" id="thrVal">0.50</div>
-      </div>
-    </div>
-
-    <details>
-      <summary>Debug log</summary>
-      <pre id="log"></pre>
-    </details>
+<div class="wrap">
+  <div class="bar">
+    <div class="title">Live Detector (iPhone-friendly)</div>
+    <div class="sub">If you run detection too fast, Safari “freezes” because detection blocks the UI thread. This version throttles it. :contentReference[oaicite:1]{index=1}</div>
   </div>
 
-  <script type="module">
-    // MediaPipe Tasks Vision (ObjectDetector + FaceDetector)
-    // Docs: https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector/web_js
-    //      https://ai.google.dev/edge/mediapipe/solutions/vision/face_detector/web_js
+  <div class="stage" id="stage" style="aspect-ratio:16/9;">
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="canvas"></canvas>
+    <div class="hud">
+      <div class="pill" id="status">Status: idle</div>
+      <div class="pill" id="detCount">Detections: 0</div>
+      <div class="pill" id="fps">Draw FPS: --</div>
+    </div>
+  </div>
 
-    import { ObjectDetector, FaceDetector, FilesetResolver } from
-      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32";
+  <div class="panel">
+    <button id="start">Start Camera</button>
+    <button id="stop" class="secondary" disabled>Stop</button>
 
-    const OBJECT_MODEL_URL =
-      "https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite";
-    const FACE_MODEL_URL =
-      "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite";
+    <div class="field">
+      <label>Mode</label>
+      <select id="mode">
+        <option value="objects" selected>Objects (includes “person”)</option>
+        <option value="faces">Faces</option>
+        <option value="both">Objects + Faces (slower)</option>
+      </select>
+    </div>
 
-    const el = (id) => document.getElementById(id);
-    const video = el("video");
-    const stage = el("stage");
-    const canvas = el("overlay");
-    const ctx = canvas.getContext("2d");
+    <div class="field">
+      <label>Camera</label>
+      <select id="cam">
+        <option value="environment" selected>Back</option>
+        <option value="user">Front</option>
+      </select>
+    </div>
 
-    const startBtn = el("startBtn");
-    const stopBtn  = el("stopBtn");
-    const modeSel  = el("modeSel");
-    const camSel   = el("camSel");
-    const thr      = el("thr");
-    const thrVal   = el("thrVal");
+    <div class="field">
+      <label>Min score</label>
+      <input id="score" type="range" min="0.10" max="0.90" step="0.05" value="0.25">
+      <span id="scoreVal" style="font-size:12px;color:var(--muted)">0.25</span>
+    </div>
 
-    const statusEl = el("status");
-    const fpsEl    = el("fps");
-    const modePill = el("modePill");
-    const logEl    = el("log");
+    <div class="field">
+      <label>Detections/sec</label>
+      <input id="rate" type="range" min="1" max="10" step="1" value="3">
+      <span id="rateVal" style="font-size:12px;color:var(--muted)">3</span>
+    </div>
+  </div>
 
-    let stream = null;
-    let running = false;
-    let rafId = null;
+  <div class="bar">
+    <div class="sub" style="margin-bottom:8px;">Debug log (if something fails, it will show here)</div>
+    <pre id="log"></pre>
+  </div>
+</div>
 
-    let objectDetector = null;
-    let faceDetector = null;
+<script type="module">
+  import { ObjectDetector, FaceDetector, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32";
 
-    let lastObj = null;
-    let lastFace = null;
+  const OBJECT_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite";
+  const FACE_MODEL_URL   = "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite";
 
-    let lastObjRun = 0;
-    let lastFaceRun = 0;
+  const $ = (id) => document.getElementById(id);
+  const video = $("video");
+  const canvas = $("canvas");
+  const ctx = canvas.getContext("2d");
 
-    // Tune these if you want more speed vs more accuracy
-    const OBJ_INTERVAL_MS  = 90;  // ~11 fps object detection
-    const FACE_INTERVAL_MS = 55;  // ~18 fps face detection
+  const stage = $("stage");
+  const statusEl = $("status");
+  const detCountEl = $("detCount");
+  const fpsEl = $("fps");
+  const logEl = $("log");
 
-    // FPS counter
-    let fpsFrames = 0;
-    let fpsLastT = performance.now();
+  const startBtn = $("start");
+  const stopBtn = $("stop");
+  const modeSel = $("mode");
+  const camSel = $("cam");
+  const score = $("score");
+  const scoreVal = $("scoreVal");
+  const rate = $("rate");
+  const rateVal = $("rateVal");
 
-    function log(msg){
-      const t = new Date().toLocaleTimeString();
-      logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
-    }
+  let stream = null;
+  let running = false;
 
-    function setStatus(msg){
-      statusEl.textContent = `Status: ${msg}`;
-    }
+  let objectDetector = null;
+  let faceDetector = null;
 
-    function setModePill(){
-      modePill.textContent = `Mode: ${modeSel.value}`;
-    }
+  let lastObjResult = null;
+  let lastFaceResult = null;
 
-    function resizeStageToVideo(){
-      const vw = video.videoWidth || 1280;
-      const vh = video.videoHeight || 720;
-      stage.style.aspectRatio = `${vw} / ${vh}`;
+  // draw fps
+  let frames = 0, lastFpsT = performance.now();
 
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width  = Math.round(vw * dpr);
-      canvas.height = Math.round(vh * dpr);
-      // Draw in video pixel units:
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
+  function log(msg){
+    const t = new Date().toLocaleTimeString();
+    logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
+  }
+  function setStatus(s){ statusEl.textContent = `Status: ${s}`; }
 
-    function clear(){
-      ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
-    }
+  function resizeToVideo(){
+    const vw = video.videoWidth || 1280;
+    const vh = video.videoHeight || 720;
+    stage.style.aspectRatio = `${vw}/${vh}`;
+    canvas.width = vw;
+    canvas.height = vh;
+  }
 
-    function drawLabel(x, y, text, bg = "rgba(0,0,0,.55)"){
-      ctx.font = "14px ui-sans-serif, system-ui";
-      ctx.textBaseline = "top";
-      const padX = 8, padY = 5;
-      const w = ctx.measureText(text).width + padX*2;
-      const h = 14 + padY*2;
+  function drawBox(x,y,w,h,color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x,y,w,h);
+  }
+  function drawLabel(x,y,text,bg="rgba(0,0,0,.55)"){
+    ctx.font = "16px system-ui,-apple-system";
+    ctx.textBaseline = "top";
+    const padX=8,padY=5;
+    const tw = ctx.measureText(text).width;
+    const bw = tw + padX*2;
+    const bh = 16 + padY*2;
+    ctx.fillStyle = bg;
+    ctx.fillRect(x, y, bw, bh);
+    ctx.fillStyle = "rgba(255,255,255,.95)";
+    ctx.fillText(text, x+padX, y+padY);
+  }
 
-      ctx.fillStyle = bg;
-      ctx.fillRect(x, y, w, h);
+  function draw(){
+    if (!running) return;
+    if (video.readyState >= 2){
+      // FPS UI
+      frames++;
+      const now = performance.now();
+      const dt = now - lastFpsT;
+      if (dt > 600){
+        fpsEl.textContent = `Draw FPS: ${(frames*1000/dt).toFixed(1)}`;
+        frames = 0; lastFpsT = now;
+      }
 
-      ctx.fillStyle = "rgba(255,255,255,.95)";
-      ctx.fillText(text, x + padX, y + padY);
-    }
+      // clear
+      ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    function drawBox(b, color){
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 3;
-      ctx.strokeRect(b.originX, b.originY, b.width, b.height);
-    }
+      const minScore = parseFloat(score.value);
+      let count = 0;
 
-    function drawDetections(){
-      clear();
-
-      const minScore = parseFloat(thr.value);
-
-      // Objects (includes person)
-      if ((modeSel.value === "objects" || modeSel.value === "both") && lastObj?.detections){
-        for (const det of lastObj.detections){
-          const cat = det.categories?.[0];
-          if (!cat) continue;
-          if (cat.score < minScore) continue;
-
-          drawBox(det.boundingBox, "rgba(45,255,154,.95)");
-          const label = `${cat.categoryName} ${(cat.score*100).toFixed(0)}%`;
-          drawLabel(det.boundingBox.originX, Math.max(0, det.boundingBox.originY - 22), label, "rgba(0,0,0,.55)");
+      // Objects
+      if ((modeSel.value === "objects" || modeSel.value === "both") && lastObjResult?.detections){
+        for (const det of lastObjResult.detections){
+          const c = det.categories?.[0];
+          if (!c || c.score < minScore) continue;
+          count++;
+          const b = det.boundingBox;
+          drawBox(b.originX, b.originY, b.width, b.height, "rgba(45,255,154,.95)");
+          drawLabel(b.originX, Math.max(0, b.originY - 26), `${c.categoryName} ${(c.score*100).toFixed(0)}%`);
         }
       }
 
-      // Faces (+ keypoints)
-      if ((modeSel.value === "faces" || modeSel.value === "both") && lastFace?.detections){
-        for (const det of lastFace.detections){
-          const score = det.categories?.[0]?.score ?? 1;
-          if (score < minScore) continue;
-
-          drawBox(det.boundingBox, "rgba(255,209,102,.95)");
-          drawLabel(det.boundingBox.originX, Math.max(0, det.boundingBox.originY - 22), `face ${(score*100).toFixed(0)}%`, "rgba(0,0,0,.55)");
-
-          // Optional landmarks / keypoints if available:
-          if (Array.isArray(det.keypoints)){
-            ctx.fillStyle = "rgba(0,229,255,.95)";
-            for (const kp of det.keypoints){
-              // keypoints are typically in image pixels for Tasks Vision results
-              const r = 3.2;
-              ctx.beginPath();
-              ctx.arc(kp.x, kp.y, r, 0, Math.PI*2);
-              ctx.fill();
-            }
-          }
+      // Faces
+      if ((modeSel.value === "faces" || modeSel.value === "both") && lastFaceResult?.detections){
+        for (const det of lastFaceResult.detections){
+          const s = det.categories?.[0]?.score ?? 1;
+          if (s < minScore) continue;
+          count++;
+          const b = det.boundingBox;
+          drawBox(b.originX, b.originY, b.width, b.height, "rgba(255,209,102,.95)");
+          drawLabel(b.originX, Math.max(0, b.originY - 26), `face ${(s*100).toFixed(0)}%`);
         }
       }
+
+      detCountEl.textContent = `Detections: ${count}`;
     }
+    requestAnimationFrame(draw);
+  }
 
-    async function initDetectors(){
-      setStatus("loading models…");
+  async function initTasks(){
+    setStatus("loading models…");
+    log("Loading wasm + models…");
 
-      const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32/wasm"
-      );
+    const vision = await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32/wasm"
+    );
 
-      // Try GPU first, fall back to CPU if needed
-      const makeObject = async (delegate) => ObjectDetector.createFromOptions(vision, {
+    // Only load what you picked (saves a LOT of time on iPhone)
+    const wantObjects = (modeSel.value === "objects" || modeSel.value === "both");
+    const wantFaces   = (modeSel.value === "faces" || modeSel.value === "both");
+
+    async function makeObj(delegate){
+      return await ObjectDetector.createFromOptions(vision, {
         baseOptions: { modelAssetPath: OBJECT_MODEL_URL, delegate },
         runningMode: "VIDEO",
-        scoreThreshold: 0.2,
+        scoreThreshold: 0.20,
         maxResults: 8
       });
-
-      const makeFace = async (delegate) => FaceDetector.createFromOptions(vision, {
+    }
+    async function makeFace(delegate){
+      return await FaceDetector.createFromOptions(vision, {
         baseOptions: { modelAssetPath: FACE_MODEL_URL, delegate },
         runningMode: "VIDEO",
-        minDetectionConfidence: 0.2
+        minDetectionConfidence: 0.20
       });
-
-      try{
-        objectDetector = await makeObject("GPU");
-        faceDetector   = await makeFace("GPU");
-        log("Detectors initialized (GPU).");
-      }catch(e){
-        log("GPU init failed, retrying with CPU…");
-        objectDetector = await makeObject("CPU");
-        faceDetector   = await makeFace("CPU");
-        log("Detectors initialized (CPU).");
-      }
-
-      setStatus("ready");
     }
 
-    async function startCamera(){
-      if (!objectDetector || !faceDetector){
-        await initDetectors();
-      }
-
-      const facingMode = camSel.value; // "environment" or "user"
-      setStatus("requesting camera…");
-
-      // Stop old stream if any
-      stopCamera();
-
-      const constraints = {
-        audio: false,
-        video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 640 },
-          height: { ideal: 480 }
-        }
-      };
-
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
-      video.srcObject = stream;
-
-      await video.play();
-
-      // Wait for dimensions
-      await new Promise((res) => {
-        if (video.videoWidth) return res();
-        video.onloadedmetadata = () => res();
-      });
-
-      resizeStageToVideo();
-      setModePill();
-
-      running = true;
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-
-      lastObj = null;
-      lastFace = null;
-      lastObjRun = 0;
-      lastFaceRun = 0;
-
-      fpsFrames = 0;
-      fpsLastT = performance.now();
-
-      setStatus("running");
-      log(`Camera started (${facingMode}).`);
-      rafId = requestAnimationFrame(loop);
+    // Try GPU, fall back to CPU
+    try{
+      if (wantObjects) objectDetector = await makeObj("GPU");
+      if (wantFaces)   faceDetector   = await makeFace("GPU");
+      log("Tasks ready (GPU).");
+    }catch(e){
+      log("GPU failed, falling back to CPU… " + (e?.message || e));
+      if (wantObjects) objectDetector = await makeObj("CPU");
+      if (wantFaces)   faceDetector   = await makeFace("CPU");
+      log("Tasks ready (CPU).");
     }
 
-    function stopCamera(){
-      running = false;
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = null;
+    setStatus("ready");
+  }
 
-      if (video){
-        video.pause();
-        video.srcObject = null;
+  async function start(){
+    log("Starting…");
+    setStatus("requesting camera…");
+
+    // stop old
+    stop();
+
+    // init detectors for current mode
+    await initTasks();
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio:false,
+      video:{
+        facingMode:{ideal: camSel.value},
+        width:{ideal: 640},
+        height:{ideal: 480}
       }
-      if (stream){
-        for (const track of stream.getTracks()) track.stop();
-        stream = null;
-      }
+    });
 
-      clear();
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      setStatus("idle");
-      log("Camera stopped.");
-    }
+    video.srcObject = stream;
+    await video.play();
 
-    function loop(now){
+    await new Promise(res => {
+      if (video.videoWidth) return res();
+      video.onloadedmetadata = () => res();
+    });
+
+    resizeToVideo();
+
+    running = true;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+
+    lastObjResult = null;
+    lastFaceResult = null;
+
+    setStatus("running");
+    log("Camera running.");
+
+    // Detection loop (THROTTLED)
+    const detectionsPerSec = () => Math.max(1, parseInt(rate.value, 10) || 3);
+    const tick = async () => {
       if (!running) return;
 
-      // FPS UI
-      fpsFrames++;
-      const dt = now - fpsLastT;
-      if (dt >= 500){
-        fpsEl.textContent = `FPS: ${(fpsFrames * 1000 / dt).toFixed(1)}`;
-        fpsFrames = 0;
-        fpsLastT = now;
-      }
-
-      // Only run inference when video is ready
-      if (video.readyState >= 2){
-        // Object detection
-        if ((modeSel.value === "objects" || modeSel.value === "both") && (now - lastObjRun >= OBJ_INTERVAL_MS)){
-          try{
-            lastObj = objectDetector.detectForVideo(video, now);
-          }catch(e){
-            log("Object detect error: " + (e?.message || e));
-          }
-          lastObjRun = now;
+      const startMs = performance.now();
+      try{
+        // Objects first (most useful)
+        if (objectDetector && (modeSel.value === "objects" || modeSel.value === "both")){
+          lastObjResult = objectDetector.detectForVideo(video, startMs);
         }
 
-        // Face detection
-        if ((modeSel.value === "faces" || modeSel.value === "both") && (now - lastFaceRun >= FACE_INTERVAL_MS)){
-          try{
-            lastFace = faceDetector.detectForVideo(video, now);
-          }catch(e){
-            log("Face detect error: " + (e?.message || e));
-          }
-          lastFaceRun = now;
-        }
+        // Yield a tiny bit before faces so Safari doesn’t “lock up”
+        await new Promise(r => setTimeout(r, 0));
 
-        drawDetections();
+        if (faceDetector && (modeSel.value === "faces" || modeSel.value === "both")){
+          lastFaceResult = faceDetector.detectForVideo(video, performance.now());
+        }
+      }catch(e){
+        log("Detection error: " + (e?.message || e));
       }
 
-      rafId = requestAnimationFrame(loop);
+      const interval = 1000 / detectionsPerSec();
+      setTimeout(tick, interval);
+    };
+
+    requestAnimationFrame(draw);
+    tick();
+  }
+
+  function stop(){
+    running = false;
+
+    if (video){
+      video.pause();
+      video.srcObject = null;
+    }
+    if (stream){
+      for (const t of stream.getTracks()) t.stop();
+      stream = null;
     }
 
-    // UI wiring
-    startBtn.addEventListener("click", () => startCamera().catch(err => {
-      setStatus("camera error");
-      log("getUserMedia failed: " + (err?.message || err));
-      alert("Camera failed. Make sure you're on HTTPS and allowed camera access.");
-    }));
-    stopBtn.addEventListener("click", stopCamera);
+    objectDetector = null;
+    faceDetector = null;
 
-    modeSel.addEventListener("change", () => {
-      setModePill();
-      log(`Mode set: ${modeSel.value}`);
-    });
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    camSel.addEventListener("change", async () => {
-      log(`Camera set: ${camSel.value}`);
-      if (running){
-        await startCamera().catch(e => log("Restart camera failed: " + (e?.message || e)));
-      }
-    });
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    setStatus("idle");
+  }
 
-    thr.addEventListener("input", () => {
-      thrVal.textContent = parseFloat(thr.value).toFixed(2);
-    });
+  // UI
+  score.addEventListener("input", () => scoreVal.textContent = (+score.value).toFixed(2));
+  rate.addEventListener("input", () => rateVal.textContent = rate.value);
 
-    // Initial UI state
-    thrVal.textContent = parseFloat(thr.value).toFixed(2);
-    setModePill();
-    setStatus("idle (press Start Camera)");
-    log("Loaded. Press Start Camera.");
-  </script>
+  modeSel.addEventListener("change", () => {
+    log("Mode changed to: " + modeSel.value + " (restart required)");
+    // Don’t auto-restart; iPhone browsers can be picky. You can press Start again.
+  });
+
+  camSel.addEventListener("change", () => log("Camera changed to: " + camSel.value + " (restart required)"));
+
+  startBtn.addEventListener("click", () => start().catch(err => {
+    setStatus("error");
+    log("Start failed: " + (err?.message || err));
+    alert("Start failed. Make sure you’re on HTTPS and allowed camera access.");
+  }));
+
+  stopBtn.addEventListener("click", stop);
+
+  // init labels
+  scoreVal.textContent = (+score.value).toFixed(2);
+  rateVal.textContent = rate.value;
+  log("Loaded. Tip: Start with Mode = Objects and Detections/sec = 3.");
+</script>
 </body>
 </html>
